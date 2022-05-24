@@ -1,0 +1,19 @@
+{
+  "targets": {
+    "debug": {
+      "outFile": "src/image-processor/my-wasm.wasm",
+      "textFile": "src/image-processor/my-wasm.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "src/image-processor/my-wasm.wasm",
+      "textFile": "src/image-processor/my-wasm.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  }
+}
