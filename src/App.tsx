@@ -26,7 +26,7 @@ const Header = styled.header`
 `;
 
 function App() {
-    const [showPopup, setShowPopup] = useState<{
+    const [popupState, setPopupState] = useState<{
         showPopup: boolean;
         reason: string | undefined;
     }>({ showPopup: false, reason: undefined });
@@ -35,25 +35,27 @@ function App() {
         event: React.SyntheticEvent<HTMLImageElement, Event>,
         reason: string
     ) => {
-        setShowPopup({
+        setPopupState({
             showPopup: true,
             reason: reason,
         });
     };
 
     const closePopup = () => {
-        setShowPopup({ showPopup: false, reason: undefined });
+        setPopupState({ showPopup: false, reason: undefined });
     };
 
     return (
         <Main>
             <Popup
-                open={showPopup.showPopup}
+                open={popupState.showPopup}
                 onClose={closePopup}
                 closeOnDocumentClick
                 modal
             >
-                <AnnieFrown reason="that is not a valid " />
+                <AnnieFrown
+                    reason={popupState.reason ? popupState.reason : ""}
+                />
             </Popup>
             <Header>For My Poggers Girlfriend</Header>
             <Solver onPreviewError={onPreviewError}></Solver>
