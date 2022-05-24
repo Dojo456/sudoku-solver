@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement, useState } from "react";
+import { ChangeEvent, ReactElement, useRef, useState } from "react";
 import styled from "styled-components";
 
 const SolverDiv = styled.div`
@@ -34,8 +34,8 @@ interface SolverProps {
 }
 
 function Solver(props: SolverProps): ReactElement {
-    const [file, setFile] = useState<File>();
-    const [filePath, setFilePath] = useState("");
+    const [file, setFile] = useState<File | null>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const selectFile = (event: ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -58,22 +58,24 @@ function Solver(props: SolverProps): ReactElement {
                     <ImageDisplay
                         src={URL.createObjectURL(file)}
                         onError={(event) => {
-                            setFile(undefined);
-                            setFilePath("");
-
                             props.onPreviewError(
                                 event,
                                 "that is not a valid image"
                             );
+
+                            setFile(null);
+                            if (inputRef.current !== null) {
+                                inputRef.current.value = "";
+                            }
                         }}
                     />
                 ) : undefined}
             </ImageDisplayBorder>
             <input
+                ref={inputRef}
                 type="file"
                 name="file"
                 accept="image/*"
-                value={filePath}
                 onChange={selectFile}
             />
         </SolverDiv>
