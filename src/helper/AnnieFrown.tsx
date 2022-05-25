@@ -24,10 +24,7 @@ function AnnieFrown(props: AnnieFrownProps): ReactElement {
         <PopupDiv>
             <PopupSpan>
                 <img src={annieFrown} alt="annie frowning :(" />
-                <p>
-                    {props.reason}, annie is disappointed in you for tyring to
-                    break the app (she talks in third person)
-                </p>
+                <p>{props.reason}</p>
             </PopupSpan>
         </PopupDiv>
     );

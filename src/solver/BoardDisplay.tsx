@@ -71,7 +71,7 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
         } else {
             // 1 in 10 chance of doing stupid shit
             if (Math.random() < 0.1) {
-                context.showErrorPopup(
+                context.showInfoPopup(
                     "that's teh stupidest input i've ever seen. why would you put that"
                 );
             }

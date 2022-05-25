@@ -5,10 +5,12 @@ import AnnieFrown from "./AnnieFrown";
 
 export interface HelperContextInterface {
     showErrorPopup(message: string): void;
+    showInfoPopup(message: string): void;
 }
 
 export const HelperContext = React.createContext<HelperContextInterface>({
     showErrorPopup: () => {},
+    showInfoPopup: () => {},
 });
 
 const CloseButton = styled.button`
@@ -37,7 +39,16 @@ export default function Helper(props: any): ReactElement {
     const showErrorPopup = (reason: string) => {
         setPopupState({
             showPopup: true,
-            reason: reason,
+            reason:
+                reason +
+                ", annie is disappointed in you for tyring to break the app (she talks in third person)",
+        });
+    };
+
+    const showInfoPopup = (reason: string) => {
+        setPopupState({
+            showPopup: true,
+            reason: reason + ", annie just wanted to let you know that",
         });
     };
 
@@ -46,7 +57,12 @@ export default function Helper(props: any): ReactElement {
     };
 
     return (
-        <HelperContext.Provider value={{ showErrorPopup: showErrorPopup }}>
+        <HelperContext.Provider
+            value={{
+                showErrorPopup: showErrorPopup,
+                showInfoPopup: showInfoPopup,
+            }}
+        >
             <Popup
                 open={popupState.showPopup}
                 onClose={closePopup}
