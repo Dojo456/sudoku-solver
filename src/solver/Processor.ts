@@ -1,3 +1,5 @@
+import WorkerCode from "./worker";
+
 export type Board = Row[];
 
 type Row = (number | null)[];
@@ -46,4 +48,45 @@ export function isValidBoard(board: Board): boolean {
     }
 
     return true;
+}
+
+let worker: WorkerBuilder | null = null;
+export function getProcessor(): Processor {
+    if (worker === null) {
+        worker = new WorkerBuilder();
+    }
+
+    return new Processor(worker as WorkerBuilder);
+}
+
+class Processor {
+    worker: WorkerBuilder;
+    onMessage: (() => void) | null = null;
+
+    constructor(worker: WorkerBuilder) {
+        this.worker = worker;
+
+        worker.onmessage = () => {
+            if (this.onMessage !== null) {
+                this.onMessage();
+            }
+        };
+    }
+
+    terminate() {
+        this.worker.terminate();
+        worker = null;
+    }
+
+    postMessage(message: any) {
+        this.worker.postMessage(message);
+    }
+}
+
+export class WorkerBuilder extends Worker {
+    constructor() {
+        const code = WorkerCode.toString();
+        const blob = new Blob([`(${code})()`]);
+        super(URL.createObjectURL(blob));
+    }
 }
