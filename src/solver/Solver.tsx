@@ -1,7 +1,7 @@
 import { ReactElement, useState } from "react";
 import styled from "styled-components";
 import BoarDisplay from "./BoardDisplay";
-import { Board } from "./Processor";
+import { Board, isValidBoard } from "./Processor";
 
 const SolverDiv = styled.div`
     position: relative;
@@ -31,13 +31,11 @@ export default function Solver(): ReactElement {
     const [board, setBoard] = useState(emptyBoard);
 
     const onCellSave = (value: number, row: number, column: number) => {
-        console.log("saving cell");
-
         setBoard((board) => {
             return board.map((cellRow, i) => {
                 return cellRow.map((cell, j) => {
                     if (i === row && j === column) {
-                        return value;
+                        return isNaN(value) ? null : value;
                     } else {
                         return cell;
                     }
@@ -48,6 +46,7 @@ export default function Solver(): ReactElement {
 
     return (
         <SolverDiv>
+            <h1>{JSON.stringify(isValidBoard(board))}</h1>
             <ImageDisplayBorder>
                 <BoarDisplay board={board} onCellSave={onCellSave} />
             </ImageDisplayBorder>
