@@ -1,7 +1,7 @@
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useState } from "react";
 import styled from "styled-components";
 import BoarDisplay from "./BoardDisplay";
-import { Board, isValidBoard, Processor } from "./Processor";
+import { Board, getProcessor, isValidBoard } from "./Processor";
 
 const SolverDiv = styled.div`
     position: relative;
@@ -24,6 +24,11 @@ const ImageDisplayBorder = styled.div`
     overflow: hidden;
 `;
 
+const SolveButton = styled.button`
+    font-size: 30px;
+    margin: 10px;
+`;
+
 export default function Solver(): ReactElement {
     const emptyBoard: Board = new Array(9);
     emptyBoard.fill(new Array<number | null>(9).fill(null));
@@ -44,22 +49,26 @@ export default function Solver(): ReactElement {
         });
     };
 
-    const processor = useMemo(() => {
-        const newProcessor = new Processor();
-        newProcessor.onMessage = () => {
-            console.log("received fro web worker");
-        };
-        return newProcessor;
-    }, []);
+    const processor = getProcessor();
+
+    processor.onMessage = (message) => {
+        console.log("received fro web worker", message);
+    };
+
+    const onSolveButtonClick = () => {
+        processor.solveBoard(board).then((value) => {
+            setBoard(value);
+        });
+    };
 
     return (
         <SolverDiv>
-            <button
-                onClick={() => {
-                    processor.postMessage(5);
-                }}
-            />
-            <h1>{JSON.stringify(isValidBoard(board))}</h1>
+            <SolveButton
+                disabled={!isValidBoard(board)}
+                onClick={onSolveButtonClick}
+            >
+                Solve
+            </SolveButton>
             <ImageDisplayBorder>
                 <BoarDisplay board={board} onCellSave={onCellSave} />
             </ImageDisplayBorder>
