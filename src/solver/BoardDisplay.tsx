@@ -34,27 +34,40 @@ const SpecialBoardCell = styled(BoardCell)`
     border-right: 2px solid black;
 `;
 
+const CellInput = styled.input`
+    display: block;
+    height: 100%;
+    width: 100%;
+    border: none;
+    font-size: 30px;
+    text-align: center;
+    &:focus {
+        outline: none;
+    }
+`;
+
 interface BoardDisplayProps {
     board: Board;
+    onCellSave(value: number, x: number, y: number): void;
 }
 
 export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
-    const { board } = props;
+    const { board, onCellSave } = props;
     const context = useContext<HelperContextInterface>(HelperContext);
 
-    const onCellInputChange = (
-        event: React.FormEvent<HTMLTableCellElement>
-    ) => {
-        const value = event.currentTarget.textContent;
-
-        console.log(value);
-
+    const invalidValue = (value: string): boolean => {
         // @ts-expect-error value is type string, but is NaN for reason is typed to accept number???
         // that doesn't make sense
-        if (value === null || value.length > 1 || isNaN(value)) {
+        return value === null || value.length > 1 || isNaN(value);
+    };
+
+    const onCellInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.currentTarget.value;
+
+        if (invalidValue(value)) {
             context.showErrorPopup("that's not a valid input");
 
-            event.currentTarget.textContent = "";
+            event.currentTarget.value = "";
         } else {
             // 1 in 10 chance of doing stupid shit
             if (Math.random() < 0.1) {
@@ -68,24 +81,39 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
     return (
         <BoardTable>
             <tbody>
-                {board.map((row, index) => {
+                {board.map((row, rowIndex) => {
                     const RowStyle =
-                        (index + 1) % 3 === 0 ? SpecialBoardRow : BoardRow;
+                        (rowIndex + 1) % 3 === 0 ? SpecialBoardRow : BoardRow;
 
                     return (
-                        <RowStyle key={index}>
-                            {row.map((number, index) => {
+                        <RowStyle key={rowIndex}>
+                            {row.map((number, columnIndex) => {
                                 const CellStyle =
-                                    (index + 1) % 3 === 0
+                                    (columnIndex + 1) % 3 === 0
                                         ? SpecialBoardCell
                                         : BoardCell;
 
                                 return (
-                                    <CellStyle
-                                        contentEditable="true"
-                                        onInput={onCellInputChange}
-                                    >
-                                        {number}
+                                    <CellStyle key={columnIndex}>
+                                        <CellInput
+                                            type="text"
+                                            value={
+                                                number === null ? "" : number
+                                            }
+                                            onChange={onCellInputChange}
+                                            onChangeCapture={(event) => {
+                                                const value =
+                                                    event.currentTarget.value;
+
+                                                if (!invalidValue(value)) {
+                                                    onCellSave(
+                                                        parseInt(value),
+                                                        rowIndex,
+                                                        columnIndex
+                                                    );
+                                                }
+                                            }}
+                                        />
                                     </CellStyle>
                                 );
                             })}

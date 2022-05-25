@@ -30,10 +30,26 @@ export default function Solver(): ReactElement {
 
     const [board, setBoard] = useState(emptyBoard);
 
+    const onCellSave = (value: number, row: number, column: number) => {
+        console.log("saving cell");
+
+        setBoard((board) => {
+            return board.map((cellRow, i) => {
+                return cellRow.map((cell, j) => {
+                    if (i === row && j === column) {
+                        return value;
+                    } else {
+                        return cell;
+                    }
+                });
+            });
+        });
+    };
+
     return (
         <SolverDiv>
             <ImageDisplayBorder>
-                <BoarDisplay board={board} />
+                <BoarDisplay board={board} onCellSave={onCellSave} />
             </ImageDisplayBorder>
         </SolverDiv>
     );
