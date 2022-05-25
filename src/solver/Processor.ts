@@ -50,43 +50,29 @@ export function isValidBoard(board: Board): boolean {
     return true;
 }
 
-let worker: WorkerBuilder | null = null;
-export function getProcessor(): Processor {
-    if (worker === null) {
-        worker = new WorkerBuilder();
-    }
-
-    return new Processor(worker as WorkerBuilder);
-}
-
-class Processor {
-    worker: WorkerBuilder;
-    onMessage: (() => void) | null = null;
-
-    constructor(worker: WorkerBuilder) {
-        this.worker = worker;
-
-        worker.onmessage = () => {
-            if (this.onMessage !== null) {
-                this.onMessage();
-            }
-        };
-    }
-
-    terminate() {
-        this.worker.terminate();
-        worker = null;
-    }
-
-    postMessage(message: any) {
-        this.worker.postMessage(message);
-    }
-}
-
 export class WorkerBuilder extends Worker {
     constructor() {
         const code = WorkerCode.toString();
         const blob = new Blob([`(${code})()`]);
         super(URL.createObjectURL(blob));
+    }
+}
+
+let worker: WorkerBuilder = new WorkerBuilder();
+export class Processor {
+    onMessage: (() => void) | null = null;
+
+    constructor() {
+        const that = this;
+
+        worker.onmessage = (message) => {
+            if (that.onMessage !== null) {
+                that.onMessage();
+            }
+        };
+    }
+
+    postMessage(message: any) {
+        worker.postMessage(message);
     }
 }

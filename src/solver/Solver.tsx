@@ -1,7 +1,7 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import styled from "styled-components";
 import BoarDisplay from "./BoardDisplay";
-import { Board, isValidBoard, WorkerBuilder } from "./Processor";
+import { Board, isValidBoard, Processor } from "./Processor";
 
 const SolverDiv = styled.div`
     position: relative;
@@ -44,24 +44,19 @@ export default function Solver(): ReactElement {
         });
     };
 
-    const instance = new WorkerBuilder();
-
-    useEffect(() => {
-        instance.onmessage = () => {
+    const processor = useMemo(() => {
+        const newProcessor = new Processor();
+        newProcessor.onMessage = () => {
             console.log("received fro web worker");
         };
-
-        return () => {
-            console.log("terminate");
-            instance.terminate();
-        };
-    });
+        return newProcessor;
+    }, []);
 
     return (
         <SolverDiv>
             <button
                 onClick={() => {
-                    instance.postMessage(5);
+                    processor.postMessage(5);
                 }}
             />
             <h1>{JSON.stringify(isValidBoard(board))}</h1>
