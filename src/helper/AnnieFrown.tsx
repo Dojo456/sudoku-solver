@@ -7,23 +7,29 @@ interface AnnieFrownProps {
     reason: string; // reason for showing this error
 }
 
+const PopupDiv = styled.div`
+    max-width: 60vh;
+    max-height: 60vh;
+`;
+
 const PopupSpan = styled.span`
-    background-color: white;
-    border: solid;
-    border-color: white;
     display: flex;
     flex-direction: column;
+    border: solid;
+    background-color: white;
 `;
 
 function AnnieFrown(props: AnnieFrownProps): ReactElement {
     return (
-        <PopupSpan>
-            <img src={annieFrown} alt="annie frowning :(" />
-            <p>
-                {props.reason}, annie is disappointed in you for tyring to break
-                the app
-            </p>
-        </PopupSpan>
+        <PopupDiv>
+            <PopupSpan>
+                <img src={annieFrown} alt="annie frowning :(" />
+                <p>
+                    {props.reason}, annie is disappointed in you for tyring to
+                    break the app (she talks in third person)
+                </p>
+            </PopupSpan>
+        </PopupDiv>
     );
 }
 
