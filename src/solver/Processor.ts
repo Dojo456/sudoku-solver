@@ -33,13 +33,9 @@ type SendableMessage = {
 
 export function isValidBoard(board: Board): boolean {
     const hasDuplicates = (arr: Row): boolean => {
-        return arr.some((element, index) => {
-            if (element !== null) {
-                return arr.indexOf(element) !== index;
-            } else {
-                return false;
-            }
-        });
+        const filtered = arr.filter(Number) as number[];
+
+        return new Set(filtered).size !== filtered.length;
     };
 
     for (let i = 0; i < 9; i++) {

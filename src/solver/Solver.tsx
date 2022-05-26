@@ -24,7 +24,7 @@ const ImageDisplayBorder = styled.div`
     overflow: hidden;
 `;
 
-const SolveButton = styled.button`
+const StyledButton = styled.button`
     font-size: 30px;
     margin: 10px;
 `;
@@ -61,17 +61,22 @@ export default function Solver(): ReactElement {
         });
     };
 
+    const onResetButtonClick = () => {
+        setBoard(emptyBoard);
+    };
+
     return (
         <SolverDiv>
-            <SolveButton
+            <StyledButton
                 disabled={!isValidBoard(board)}
                 onClick={onSolveButtonClick}
             >
                 Solve
-            </SolveButton>
+            </StyledButton>
             <ImageDisplayBorder>
                 <BoarDisplay board={board} onCellSave={onCellSave} />
             </ImageDisplayBorder>
+            <StyledButton onClick={onResetButtonClick}>Reset</StyledButton>
         </SolverDiv>
     );
 }

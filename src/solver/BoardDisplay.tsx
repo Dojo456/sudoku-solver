@@ -27,7 +27,6 @@ const BoardCell = styled.td`
     box-sizing: border-box;
     border-collapse: collapse;
     white-space: nowrap;
-    overflow: hidden;
 `;
 
 const SpecialBoardCell = styled(BoardCell)`
@@ -35,6 +34,7 @@ const SpecialBoardCell = styled(BoardCell)`
 `;
 
 const CellInput = styled.input`
+    box-sizing: border-box;
     display: block;
     height: 100%;
     width: 100%;
@@ -42,7 +42,7 @@ const CellInput = styled.input`
     font-size: 30px;
     text-align: center;
     &:focus {
-        outline: none;
+        outline-style: solid;
     }
 `;
 
@@ -56,9 +56,12 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
     const context = useContext<HelperContextInterface>(HelperContext);
 
     const invalidValue = (value: string): boolean => {
-        // @ts-expect-error value is type string, but is NaN for reason is typed to accept number???
-        // that doesn't make sense
-        return value === null || value.length > 1 || isNaN(value);
+        const parsed = parseInt(value);
+
+        return (
+            // eslint-disable-next-line use-isnan
+            value === null || value.length > 1 || parsed === NaN || parsed < 1
+        );
     };
 
     const onCellInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

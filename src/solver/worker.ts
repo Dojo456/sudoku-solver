@@ -33,13 +33,9 @@ export default function () {
 
     const isValidBoard = (board: Board): boolean => {
         const hasDuplicates = (arr: Row): boolean => {
-            return arr.some((element, index) => {
-                if (element !== null) {
-                    return arr.indexOf(element) !== index;
-                } else {
-                    return false;
-                }
-            });
+            const filtered = arr.filter(Number) as number[];
+
+            return new Set(filtered).size !== filtered.length;
         };
 
         for (let i = 0; i < 9; i++) {
@@ -80,7 +76,46 @@ export default function () {
     };
 
     const solveBoard = (board: Board): Board => {
-        return board.fill(new Array<number>(9).fill(0));
+        // simple way to deep copy an object
+        const b = JSON.parse(JSON.stringify(board));
+
+        // @ts-ignore it's recursive lol
+        const recurseSolve = (index: number): boolean => {
+            if (index === 81) {
+                return true;
+            }
+
+            const row = Math.floor(index / 9);
+            const col = index % 9;
+
+            const current = b[row][col];
+
+            if (current === null) {
+                let hasValid = false;
+
+                for (let i = 1; i < 10; i++) {
+                    b[row][col] = i;
+
+                    if (isValidBoard(b)) {
+                        hasValid = recurseSolve(index + 1);
+                        if (hasValid) {
+                            break;
+                        }
+                    }
+                }
+
+                if (!hasValid) {
+                    b[row][col] = null;
+                }
+
+                return hasValid;
+            } else {
+                return recurseSolve(index + 1);
+            }
+        };
+        recurseSolve(0);
+
+        return b;
     };
 
     const handleMessage = (rawMessage: any): ReceivableMessage | Error => {
