@@ -39,7 +39,7 @@ const CellInput = styled.input`
     height: 100%;
     width: 100%;
     border: none;
-    font-size: 30px;
+    font-size: calc(5px + 2vmin);
     text-align: center;
     &:focus {
         outline-style: solid;
@@ -56,12 +56,18 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
     const context = useContext<HelperContextInterface>(HelperContext);
 
     const invalidValue = (value: string): boolean => {
-        const parsed = parseInt(value);
+        if (value === "") {
+            return false;
+        } else {
+            const parsed = parseInt(value);
 
-        return (
-            // eslint-disable-next-line use-isnan
-            value === null || value.length > 1 || parsed === NaN || parsed < 1
-        );
+            return (
+                value === null ||
+                value.length > 1 ||
+                isNaN(parsed) ||
+                parsed < 1
+            );
+        }
     };
 
     const onCellInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

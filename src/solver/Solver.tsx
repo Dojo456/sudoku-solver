@@ -20,8 +20,8 @@ const ImageDisplayBorder = styled.div`
     border-style: solid;
     border-color: purple;
     width: 40vh;
-    height: 40vh;
     overflow: hidden;
+    aspect-ratio: 1 / 1;
 `;
 
 const StyledButton = styled.button`
