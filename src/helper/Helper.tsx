@@ -1,17 +1,30 @@
 import React, { ReactElement, useState } from "react";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
-import AnnieFrown from "./AnnieFrown";
+import { default as CenterPopup } from "./CenterPopup";
 
 export interface HelperContextInterface {
-    showErrorPopup(message: string): void;
-    showInfoPopup(message: string): void;
+    showErrorPopup(person: PopupPerson, message: string, ms?: number): void;
+    showInfoPopup(
+        person: PopupPerson,
+        message: string,
+        ms?: number,
+        closeOn?: Promise<any>
+    ): void;
 }
 
 export const HelperContext = React.createContext<HelperContextInterface>({
     showErrorPopup: () => {},
     showInfoPopup: () => {},
 });
+
+const annieFrown = require("../assets/annie-frown.jpg");
+const partyCarson = require("../assets/party-carson.png");
+
+export enum PopupPerson {
+    AnnieFrown,
+    PartyCarson,
+}
 
 const CloseButton = styled.button`
     color: #fff;
@@ -30,30 +43,78 @@ const CloseButton = styled.button`
     }
 `;
 
+function getPersonPopupElement(
+    person: PopupPerson,
+    reason: string
+): ReactElement {
+    let personElement: any;
+
+    switch (person) {
+        case PopupPerson.AnnieFrown:
+            personElement = (
+                <CenterPopup
+                    imageUrl={annieFrown}
+                    alt="annie frown :(("
+                    reason={reason}
+                />
+            );
+            break;
+        case PopupPerson.PartyCarson:
+            personElement = (
+                <CenterPopup
+                    imageUrl={partyCarson}
+                    alt="party carson!!"
+                    reason={reason}
+                />
+            );
+            break;
+    }
+
+    return personElement;
+}
+
 export default function Helper(props: any): ReactElement {
     const [popupState, setPopupState] = useState<{
         showPopup: boolean;
-        reason: string | undefined;
-    }>({ showPopup: false, reason: undefined });
+        person: ReactElement | undefined;
+    }>({ showPopup: false, person: undefined });
 
-    const showErrorPopup = (reason: string) => {
+    const showErrorPopup = (person: PopupPerson, reason: string) => {
+        switch (person) {
+            case PopupPerson.AnnieFrown:
+                reason =
+                    reason +
+                    ", annie is disappointed in you for tyring to break the app (she talks in third person)";
+        }
+
         setPopupState({
             showPopup: true,
-            reason:
-                reason +
-                ", annie is disappointed in you for tyring to break the app (she talks in third person)",
+            person: getPersonPopupElement(person, reason),
         });
     };
 
-    const showInfoPopup = (reason: string) => {
+    const showInfoPopup = (
+        person: PopupPerson,
+        reason: string,
+        ms?: number,
+        closeOn?: Promise<any>
+    ) => {
         setPopupState({
             showPopup: true,
-            reason: reason + ", annie just wanted to let you know that",
+            person: getPersonPopupElement(person, reason),
         });
+
+        if (ms) {
+            setTimeout(closePopup, ms);
+        }
+
+        if (closeOn) {
+            closeOn.then(closePopup);
+        }
     };
 
     const closePopup = () => {
-        setPopupState({ showPopup: false, reason: undefined });
+        setPopupState({ showPopup: false, person: undefined });
     };
 
     return (
@@ -70,9 +131,7 @@ export default function Helper(props: any): ReactElement {
                 modal
             >
                 <CloseButton onClick={closePopup}>X</CloseButton>
-                <AnnieFrown
-                    reason={popupState.reason ? popupState.reason : ""}
-                />
+                {popupState.person}
             </Popup>
             {props.children}
         </HelperContext.Provider>

@@ -1,6 +1,10 @@
 import { ReactElement, useContext } from "react";
 import styled from "styled-components";
-import { HelperContext, HelperContextInterface } from "../helper/Helper";
+import {
+    HelperContext,
+    HelperContextInterface,
+    PopupPerson,
+} from "../helper/Helper";
 import { Board } from "./Processor";
 
 const BoardTable = styled.table`
@@ -74,13 +78,17 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
         const value = event.currentTarget.value;
 
         if (invalidValue(value)) {
-            context.showErrorPopup("that's not a valid input");
+            context.showErrorPopup(
+                PopupPerson.AnnieFrown,
+                "that's not a valid input"
+            );
 
             event.currentTarget.value = "";
         } else {
             // 1 in 10 chance of doing stupid shit
             if (Math.random() < 0.1) {
                 context.showInfoPopup(
+                    PopupPerson.AnnieFrown,
                     "that's teh stupidest input i've ever seen. why would you put that"
                 );
             }

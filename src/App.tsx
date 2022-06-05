@@ -19,6 +19,7 @@ const Header = styled.header`
     padding: 20px;
     flex: 0 1 auto;
     color: cornflowerblue;
+    font-size: calc(10px + 2vmin);
     width: 100%;
 `;
 
