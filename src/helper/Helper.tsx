@@ -20,10 +20,12 @@ export const HelperContext = React.createContext<HelperContextInterface>({
 
 const annieFrown = require("../assets/annie-frown.jpg");
 const partyCarson = require("../assets/party-carson.png");
+const staringSam = require("../assets/staring-sam.jpg");
 
 export enum PopupPerson {
     AnnieFrown,
     PartyCarson,
+    StaringSam,
 }
 
 const CloseButton = styled.button`
@@ -47,30 +49,24 @@ function getPersonPopupElement(
     person: PopupPerson,
     reason: string
 ): ReactElement {
-    let personElement: any;
+    let imageUrl: string = "";
+    let alt: string = "";
 
     switch (person) {
         case PopupPerson.AnnieFrown:
-            personElement = (
-                <CenterPopup
-                    imageUrl={annieFrown}
-                    alt="annie frown :(("
-                    reason={reason}
-                />
-            );
+            imageUrl = annieFrown;
+            alt = "annie frown :((";
             break;
         case PopupPerson.PartyCarson:
-            personElement = (
-                <CenterPopup
-                    imageUrl={partyCarson}
-                    alt="party carson!!"
-                    reason={reason}
-                />
-            );
+            imageUrl = partyCarson;
+            alt = "party carson!!";
             break;
+        case PopupPerson.StaringSam:
+            imageUrl = staringSam;
+            alt = "sam is peering into your soul";
     }
 
-    return personElement;
+    return <CenterPopup imageUrl={imageUrl} alt={alt} reason={reason} />;
 }
 
 export default function Helper(props: any): ReactElement {

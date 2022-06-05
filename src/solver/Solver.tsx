@@ -83,7 +83,7 @@ export default function Solver(): ReactElement {
                         resolve();
                     });
                 }
-            }, 2000);
+            }, 5000);
         });
 
         let person: PopupPerson;
@@ -92,8 +92,9 @@ export default function Solver(): ReactElement {
             person = PopupPerson.PartyCarson;
             message = "carson is plugging in random numbers until it works";
         } else {
-            person = PopupPerson.PartyCarson;
-            message = "imagine this is Sam";
+            person = PopupPerson.StaringSam;
+            message =
+                "our valedictorian Sam is making 1203918232 calculations a minute to find the answer";
         }
 
         context.showInfoPopup(person, message, undefined, closePromise);
