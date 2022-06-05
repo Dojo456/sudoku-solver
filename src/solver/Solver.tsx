@@ -75,8 +75,6 @@ export default function Solver(): ReactElement {
         const closePromise = new Promise<void>((resolve, reject) => {
             setTimeout(() => {
                 if (solved) {
-                    console.log("auto closing now");
-
                     resolve();
                 } else {
                     solvePromise.then(() => {
