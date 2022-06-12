@@ -22,10 +22,8 @@ const BackgroundDiv = styled.div`
 export default function AnimatedBackground(
     props: AnimatedBackgroundProps
 ): React.ReactElement {
-    const [position, setPosition] = useState({ ms: 0, x: 0, y: 0, rot: 0 });
+    const [position, setPosition] = useState({ x: 0, y: 0, rot: 0 });
     const ref = useRef(null);
-
-    console.log("recreate animation");
 
     useEffect(() => {
         if (props.animationToShow !== undefined) {
@@ -34,49 +32,52 @@ export default function AnimatedBackground(
             // @ts-ignore
             const width = ref.current.clientWidth;
 
-            const animationInterval = 16.7;
             // in milliseconds
-            const animationTime = 10000;
+            const animationTime = 4000;
 
-            const xIncrement = width / (animationTime / animationInterval);
+            const totalRots = 3;
 
-            const rotsPerSec = 0.5;
-            const rotIncrement =
-                (360 * rotsPerSec) / (1000 / animationInterval);
+            let start: number, previousTimeStamp: number;
+            const step = (timestamp: number) => {
+                if (start === undefined) {
+                    start = previousTimeStamp = timestamp;
+                }
+                const elapsed = timestamp - start;
+                const animationInterval = 0.5 * (timestamp - previousTimeStamp);
 
-            const interval = setInterval(() => {
-                setPosition(({ ms, x, y, rot }) => {
-                    const percent = 100 * (ms / animationTime);
+                const xIncrement = width / (animationTime / animationInterval);
 
-                    const calculatedY =
-                        -((height * 0.5) / 2500) * (percent * (percent - 100));
+                const rotIncrement =
+                    (360 * totalRots) / (animationTime / animationInterval);
 
-                    return {
-                        ms: ms + animationInterval,
-                        x: x + xIncrement,
-                        y: calculatedY,
-                        rot: rot + rotIncrement,
-                    };
-                });
-            }, animationInterval);
+                if (previousTimeStamp !== timestamp) {
+                    setPosition((state) => {
+                        const { x, rot } = state;
+                        const percent = 100 * (elapsed / animationTime);
 
-            const reset = () => {
-                console.log("reset");
+                        const calculatedY =
+                            -((height * 0.5) / 2500) *
+                            (percent * (percent - 100));
 
-                clearInterval(interval);
-                setPosition({
-                    ms: 0,
-                    x: 0,
-                    y: 0,
-                    rot: 0,
-                });
+                        return {
+                            x: x + xIncrement,
+                            y: calculatedY,
+                            rot: rot + rotIncrement,
+                        };
+                    });
+                }
 
-                props.onComplete();
+                if (elapsed < animationTime) {
+                    previousTimeStamp = timestamp;
+                    requestAnimationFrame(step);
+                } else {
+                    setPosition({ x: 0, y: 0, rot: 0 });
+
+                    props.onComplete();
+                }
             };
 
-            setTimeout(() => {
-                reset();
-            }, animationTime);
+            requestAnimationFrame(step);
         }
         console.log("using effect");
     }, [props]);
