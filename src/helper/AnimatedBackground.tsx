@@ -9,6 +9,7 @@ export enum ShowableAnimations {
 
 interface AnimatedBackgroundProps {
     animationToShow: ShowableAnimations | undefined;
+    onComplete: () => void;
 }
 
 const BackgroundDiv = styled.div`
@@ -21,61 +22,73 @@ const BackgroundDiv = styled.div`
 export default function AnimatedBackground(
     props: AnimatedBackgroundProps
 ): React.ReactElement {
-    const [position, setPosition] = useState({ ms: 0, x: 0, y: 0 });
+    const [position, setPosition] = useState({ ms: 0, x: 0, y: 0, rot: 0 });
     const ref = useRef(null);
 
     console.log("recreate animation");
 
     useEffect(() => {
-        // @ts-ignore
-        const height = ref.current.clientHeight;
-        // @ts-ignore
-        const width = ref.current.clientWidth;
+        if (props.animationToShow !== undefined) {
+            // @ts-ignore
+            const height = ref.current.clientHeight;
+            // @ts-ignore
+            const width = ref.current.clientWidth;
 
-        console.log("dimensions are", width, height);
+            console.log("dimensions are", width, height);
 
-        const animationInterval = 10;
-        // in milliseconds
-        const animationTime = 2000;
+            const animationInterval = 10;
+            // in milliseconds
+            const animationTime = 2000;
 
-        const xIncrement = width / (animationTime / animationInterval);
+            const xIncrement = width / (animationTime / animationInterval);
 
-        console.log("xIncrement", xIncrement);
+            const rotsPerSec = 2;
+            const rotIncrement =
+                (360 * rotsPerSec) / (1000 / animationInterval);
 
-        const interval = setInterval(() => {
-            setPosition(({ ms, x, y }) => {
-                const percent = 100 * (ms / animationTime);
+            console.log("xIncrement", xIncrement);
+            console.log("rotIncrement", rotIncrement);
 
-                console.log("percent", percent);
+            const interval = setInterval(() => {
+                setPosition(({ ms, x, y, rot }) => {
+                    const percent = 100 * (ms / animationTime);
 
-                const calculatedY =
-                    -((height * 0.5) / 2500) * (percent * (percent - 100));
+                    console.log("percent", percent);
 
-                console.log("position", x, calculatedY);
+                    const calculatedY =
+                        -((height * 0.5) / 2500) * (percent * (percent - 100));
 
-                return {
-                    ms: ms + animationInterval,
-                    x: x + xIncrement,
-                    y: y,
-                };
-            });
-        }, animationInterval);
+                    console.log("position", x, calculatedY);
 
-        const reset = () => {
-            console.log("reset");
+                    return {
+                        ms: ms + animationInterval,
+                        x: x + xIncrement,
+                        y: calculatedY,
+                        rot: rot + rotIncrement,
+                    };
+                });
+            }, animationInterval);
 
-            clearInterval(interval);
-            setPosition({
-                ms: 0,
-                x: 0,
-                y: 0,
-            });
-        };
+            const reset = () => {
+                console.log("reset");
 
-        setTimeout(() => {
-            reset();
-        }, animationTime);
-    }, []);
+                clearInterval(interval);
+                setPosition({
+                    ms: 0,
+                    x: 0,
+                    y: 0,
+                    rot: 0,
+                });
+
+                props.onComplete();
+            };
+
+            setTimeout(() => {
+                reset();
+            }, animationTime);
+        }
+        console.log("using effect");
+    }, [props]);
 
     let animationShowing: any;
 
@@ -87,7 +100,8 @@ export default function AnimatedBackground(
                 style={{
                     position: "absolute",
                     right: `${position.x}px`,
-                    top: `100px`,
+                    bottom: `${position.y}px`,
+                    transform: `rotate(${position.rot}deg)`,
                     width: "300px",
                 }}
             />

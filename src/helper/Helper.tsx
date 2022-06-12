@@ -151,11 +151,16 @@ export default function Helper(props: any): ReactElement {
         setAnimationShowing(animationToShow);
     };
 
+    const resetAnimation = () => {
+        setAnimationShowing(undefined);
+    };
+
     return (
         <MainDiv>
             <BackDiv>
                 <AnimatedBackground
                     animationToShow={animationShowing}
+                    onComplete={resetAnimation}
                 ></AnimatedBackground>
             </BackDiv>
             <FrontDiv>
