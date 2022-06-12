@@ -1,7 +1,14 @@
 import React, { ReactElement, useState } from "react";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
+import AnimatedBackground, { ShowableAnimations } from "./AnimatedBackground";
 import { default as CenterPopup } from "./CenterPopup";
+
+export enum PopupPerson {
+    AnnieFrown,
+    PartyCarson,
+    StaringSam,
+}
 
 export interface HelperContextInterface {
     showErrorPopup(person: PopupPerson, message: string, ms?: number): void;
@@ -11,22 +18,18 @@ export interface HelperContextInterface {
         ms?: number,
         closeOn?: Promise<any>
     ): void;
+    showAnimation(animation: ShowableAnimations): void;
 }
 
 export const HelperContext = React.createContext<HelperContextInterface>({
     showErrorPopup: () => {},
     showInfoPopup: () => {},
+    showAnimation: () => {},
 });
 
 const annieFrown = require("../assets/annie-frown.jpg");
 const partyCarson = require("../assets/party-carson.png");
 const staringSam = require("../assets/staring-sam.jpg");
-
-export enum PopupPerson {
-    AnnieFrown,
-    PartyCarson,
-    StaringSam,
-}
 
 const CloseButton = styled.button`
     color: #fff;
@@ -43,6 +46,34 @@ const CloseButton = styled.button`
         color: #000;
         cursor: pointer;
     }
+`;
+
+const OverlappingDivs = styled.div`
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+`;
+
+const BackDiv = styled(OverlappingDivs)`
+    z-index: 100;
+`;
+
+const FrontDiv = styled(OverlappingDivs)`
+    z-index: 110;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    color: white;
+`;
+
+const MainDiv = styled.div`
+    display: contents;
+    position: relative;
+    width: 100%;
+    height: 100%; ;
 `;
 
 function getPersonPopupElement(
@@ -113,23 +144,40 @@ export default function Helper(props: any): ReactElement {
         setPopupState({ showPopup: false, person: undefined });
     };
 
+    const [animationShowing, setAnimationShowing] =
+        useState<ShowableAnimations>();
+
+    const showAnimation = (animationToShow: ShowableAnimations) => {
+        setAnimationShowing(animationToShow);
+    };
+
     return (
-        <HelperContext.Provider
-            value={{
-                showErrorPopup: showErrorPopup,
-                showInfoPopup: showInfoPopup,
-            }}
-        >
-            <Popup
-                open={popupState.showPopup}
-                onClose={closePopup}
-                closeOnDocumentClick
-                modal
-            >
-                <CloseButton onClick={closePopup}>X</CloseButton>
-                {popupState.person}
-            </Popup>
-            {props.children}
-        </HelperContext.Provider>
+        <MainDiv>
+            <BackDiv>
+                <AnimatedBackground
+                    animationToShow={animationShowing}
+                ></AnimatedBackground>
+            </BackDiv>
+            <FrontDiv>
+                <HelperContext.Provider
+                    value={{
+                        showErrorPopup: showErrorPopup,
+                        showInfoPopup: showInfoPopup,
+                        showAnimation: showAnimation,
+                    }}
+                >
+                    <Popup
+                        open={popupState.showPopup}
+                        onClose={closePopup}
+                        closeOnDocumentClick
+                        modal
+                    >
+                        <CloseButton onClick={closePopup}>X</CloseButton>
+                        {popupState.person}
+                    </Popup>
+                    {props.children}
+                </HelperContext.Provider>
+            </FrontDiv>
+        </MainDiv>
     );
 }

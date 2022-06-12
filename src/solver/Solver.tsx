@@ -1,5 +1,6 @@
 import { ReactElement, useContext, useState } from "react";
 import styled from "styled-components";
+import { ShowableAnimations } from "../helper/AnimatedBackground";
 import {
     HelperContext,
     HelperContextInterface,
@@ -76,12 +77,16 @@ export default function Solver(): ReactElement {
             setTimeout(() => {
                 if (solved) {
                     resolve();
+                    context.showAnimation(ShowableAnimations.SwingingDakota);
                 } else {
                     solvePromise.then(() => {
                         resolve();
+                        context.showAnimation(
+                            ShowableAnimations.SwingingDakota
+                        );
                     });
                 }
-            }, 5000);
+            }, 2000);
         });
 
         let person: PopupPerson;

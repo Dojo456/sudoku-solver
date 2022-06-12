@@ -5,13 +5,8 @@ import Solver from "./solver/Solver";
 
 const Main = styled.div`
     background-color: cornflowerblue;
-    display: flex;
-    flex-flow: column;
     height: 100vh;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    color: white;
+    width: 100vw;
 `;
 
 const Header = styled.header`
@@ -43,7 +38,7 @@ function App() {
             <Helper>
                 <Header>
                     <HeaderSpan>
-                        <img src={logo} alt="logo" height="150px" />
+                        <img src={logo} alt="logo" height="70px" />
                         Poggers Sudoku Solver
                     </HeaderSpan>
                 </Header>
