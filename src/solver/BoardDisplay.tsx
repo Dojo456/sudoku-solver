@@ -117,6 +117,13 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
                                             value={
                                                 number === null ? "" : number
                                             }
+                                            onFocus={(e) => {
+                                                // selects the entire cell to make editing a little easier
+                                                e.currentTarget.setSelectionRange(
+                                                    0,
+                                                    e.currentTarget.value.length
+                                                );
+                                            }}
                                             onChange={onCellInputChange}
                                             onChangeCapture={(event) => {
                                                 const value =

@@ -36,7 +36,7 @@ export default function AnimatedBackground(
 
             console.log("dimensions are", width, height);
 
-            const animationInterval = 10;
+            const animationInterval = 16.7;
             // in milliseconds
             const animationTime = 2000;
 
@@ -94,17 +94,23 @@ export default function AnimatedBackground(
 
     if (props.animationToShow !== undefined) {
         animationShowing = (
-            <img
-                src={swingingDakota}
-                alt="swinging dakota"
+            <span
                 style={{
                     position: "absolute",
                     right: `${position.x}px`,
                     bottom: `${position.y}px`,
-                    transform: `rotate(${position.rot}deg)`,
-                    width: "300px",
                 }}
-            />
+            >
+                <p>Spinning Dakota!!!</p>
+                <img
+                    src={swingingDakota}
+                    alt="swinging dakota"
+                    style={{
+                        transform: `rotate(${position.rot}deg)`,
+                        width: "300px",
+                    }}
+                />
+            </span>
         );
     }
 
