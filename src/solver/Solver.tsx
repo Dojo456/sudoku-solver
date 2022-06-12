@@ -77,12 +77,12 @@ export default function Solver(): ReactElement {
             setTimeout(() => {
                 if (solved) {
                     resolve();
-                    context.showAnimation(ShowableAnimations.SwingingDakota);
+                    context.showAnimation(ShowableAnimations.SpinningDakota);
                 } else {
                     solvePromise.then(() => {
                         resolve();
                         context.showAnimation(
-                            ShowableAnimations.SwingingDakota
+                            ShowableAnimations.SpinningDakota
                         );
                     });
                 }

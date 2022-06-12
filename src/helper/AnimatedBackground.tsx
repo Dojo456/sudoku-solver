@@ -4,7 +4,7 @@ import styled from "styled-components";
 const swingingDakota = require("../assets/swinging-dakota.png");
 
 export enum ShowableAnimations {
-    SwingingDakota,
+    SpinningDakota,
 }
 
 interface AnimatedBackgroundProps {
@@ -34,31 +34,22 @@ export default function AnimatedBackground(
             // @ts-ignore
             const width = ref.current.clientWidth;
 
-            console.log("dimensions are", width, height);
-
             const animationInterval = 16.7;
             // in milliseconds
-            const animationTime = 2000;
+            const animationTime = 10000;
 
             const xIncrement = width / (animationTime / animationInterval);
 
-            const rotsPerSec = 2;
+            const rotsPerSec = 0.5;
             const rotIncrement =
                 (360 * rotsPerSec) / (1000 / animationInterval);
-
-            console.log("xIncrement", xIncrement);
-            console.log("rotIncrement", rotIncrement);
 
             const interval = setInterval(() => {
                 setPosition(({ ms, x, y, rot }) => {
                     const percent = 100 * (ms / animationTime);
 
-                    console.log("percent", percent);
-
                     const calculatedY =
                         -((height * 0.5) / 2500) * (percent * (percent - 100));
-
-                    console.log("position", x, calculatedY);
 
                     return {
                         ms: ms + animationInterval,

@@ -59,14 +59,19 @@ const BackDiv = styled(OverlappingDivs)`
     z-index: 100;
 `;
 
-const FrontDiv = styled(OverlappingDivs)`
-    z-index: 110;
+const CenterDiv = styled(OverlappingDivs)`
+    z-index: 105;
     display: flex;
     flex-flow: column;
     align-items: center;
     text-align: center;
     justify-content: center;
     color: white;
+`;
+
+const FrontDiv = styled(OverlappingDivs)`
+    z-index: 110;
+    pointer-events: none;
 `;
 
 const MainDiv = styled.div`
@@ -144,26 +149,37 @@ export default function Helper(props: any): ReactElement {
         setPopupState({ showPopup: false, person: undefined });
     };
 
-    const [animationShowing, setAnimationShowing] =
+    const [backAnimationShowing, setBackAnimationShowing] =
         useState<ShowableAnimations>();
 
-    const showAnimation = (animationToShow: ShowableAnimations) => {
-        setAnimationShowing(animationToShow);
+    const resetBackAnimation = () => {
+        setBackAnimationShowing(undefined);
     };
 
-    const resetAnimation = () => {
-        setAnimationShowing(undefined);
+    const [frontAnimationShowing, setFrontAnimationShowing] =
+        useState<ShowableAnimations>();
+
+    const resetFrontAnimation = () => {
+        setFrontAnimationShowing(undefined);
+    };
+
+    const showAnimation = (animationToShow: ShowableAnimations) => {
+        switch (animationToShow) {
+            case ShowableAnimations.SpinningDakota:
+                setBackAnimationShowing(animationToShow);
+                break;
+        }
     };
 
     return (
         <MainDiv>
             <BackDiv>
                 <AnimatedBackground
-                    animationToShow={animationShowing}
-                    onComplete={resetAnimation}
+                    animationToShow={backAnimationShowing}
+                    onComplete={resetBackAnimation}
                 ></AnimatedBackground>
             </BackDiv>
-            <FrontDiv>
+            <CenterDiv>
                 <HelperContext.Provider
                     value={{
                         showErrorPopup: showErrorPopup,
@@ -182,6 +198,12 @@ export default function Helper(props: any): ReactElement {
                     </Popup>
                     {props.children}
                 </HelperContext.Provider>
+            </CenterDiv>
+            <FrontDiv>
+                <AnimatedBackground
+                    animationToShow={frontAnimationShowing}
+                    onComplete={resetFrontAnimation}
+                ></AnimatedBackground>
             </FrontDiv>
         </MainDiv>
     );
