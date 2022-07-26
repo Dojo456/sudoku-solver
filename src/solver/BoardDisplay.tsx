@@ -1,6 +1,10 @@
 import { ReactElement, useContext } from "react";
 import styled from "styled-components";
-import { HelperContext, HelperContextInterface } from "../helper/Helper";
+import {
+    HelperContext,
+    HelperContextInterface,
+    PopupPerson,
+} from "../helper/Helper";
 import { Board } from "./Processor";
 
 const BoardTable = styled.table`
@@ -39,7 +43,7 @@ const CellInput = styled.input`
     height: 100%;
     width: 100%;
     border: none;
-    font-size: 30px;
+    font-size: calc(5px + 2vmin);
     text-align: center;
     &:focus {
         outline-style: solid;
@@ -56,25 +60,35 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
     const context = useContext<HelperContextInterface>(HelperContext);
 
     const invalidValue = (value: string): boolean => {
-        const parsed = parseInt(value);
+        if (value === "") {
+            return false;
+        } else {
+            const parsed = parseInt(value);
 
-        return (
-            // eslint-disable-next-line use-isnan
-            value === null || value.length > 1 || parsed === NaN || parsed < 1
-        );
+            return (
+                value === null ||
+                value.length > 1 ||
+                isNaN(parsed) ||
+                parsed < 1
+            );
+        }
     };
 
     const onCellInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.currentTarget.value;
 
         if (invalidValue(value)) {
-            context.showErrorPopup("that's not a valid input");
+            context.showErrorPopup(
+                PopupPerson.AnnieFrown,
+                "that's not a valid input"
+            );
 
             event.currentTarget.value = "";
         } else {
             // 1 in 10 chance of doing stupid shit
             if (Math.random() < 0.1) {
                 context.showInfoPopup(
+                    PopupPerson.AnnieFrown,
                     "that's teh stupidest input i've ever seen. why would you put that"
                 );
             }
@@ -103,6 +117,13 @@ export default function BoarDisplay(props: BoardDisplayProps): ReactElement {
                                             value={
                                                 number === null ? "" : number
                                             }
+                                            onFocus={(e) => {
+                                                // selects the entire cell to make editing a little easier
+                                                e.currentTarget.setSelectionRange(
+                                                    0,
+                                                    e.currentTarget.value.length
+                                                );
+                                            }}
                                             onChange={onCellInputChange}
                                             onChangeCapture={(event) => {
                                                 const value =

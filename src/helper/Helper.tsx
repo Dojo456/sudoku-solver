@@ -1,17 +1,35 @@
 import React, { ReactElement, useState } from "react";
 import Popup from "reactjs-popup";
 import styled from "styled-components";
-import AnnieFrown from "./AnnieFrown";
+import AnimatedBackground, { ShowableAnimations } from "./AnimatedBackground";
+import { default as CenterPopup } from "./CenterPopup";
+
+export enum PopupPerson {
+    AnnieFrown,
+    PartyCarson,
+    StaringSam,
+}
 
 export interface HelperContextInterface {
-    showErrorPopup(message: string): void;
-    showInfoPopup(message: string): void;
+    showErrorPopup(person: PopupPerson, message: string, ms?: number): void;
+    showInfoPopup(
+        person: PopupPerson,
+        message: string,
+        ms?: number,
+        closeOn?: Promise<any>
+    ): void;
+    showAnimation(animation: ShowableAnimations): void;
 }
 
 export const HelperContext = React.createContext<HelperContextInterface>({
     showErrorPopup: () => {},
     showInfoPopup: () => {},
+    showAnimation: () => {},
 });
+
+const annieFrown = require("../assets/annie-frown.jpg");
+const partyCarson = require("../assets/party-carson.png");
+const staringSam = require("../assets/staring-sam.jpg");
 
 const CloseButton = styled.button`
     color: #fff;
@@ -30,51 +48,163 @@ const CloseButton = styled.button`
     }
 `;
 
+const OverlappingDivs = styled.div`
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+`;
+
+const BackDiv = styled(OverlappingDivs)`
+    z-index: 100;
+`;
+
+const CenterDiv = styled(OverlappingDivs)`
+    z-index: 105;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    color: white;
+`;
+
+const FrontDiv = styled(OverlappingDivs)`
+    z-index: 110;
+    pointer-events: none;
+`;
+
+const MainDiv = styled.div`
+    display: contents;
+    position: relative;
+    width: 100%;
+    height: 100%; ;
+`;
+
+function getPersonPopupElement(
+    person: PopupPerson,
+    reason: string
+): ReactElement {
+    let imageUrl: string = "";
+    let alt: string = "";
+
+    switch (person) {
+        case PopupPerson.AnnieFrown:
+            imageUrl = annieFrown;
+            alt = "annie frown :((";
+            break;
+        case PopupPerson.PartyCarson:
+            imageUrl = partyCarson;
+            alt = "party carson!!";
+            break;
+        case PopupPerson.StaringSam:
+            imageUrl = staringSam;
+            alt = "sam is peering into your soul";
+    }
+
+    return <CenterPopup imageUrl={imageUrl} alt={alt} reason={reason} />;
+}
+
 export default function Helper(props: any): ReactElement {
     const [popupState, setPopupState] = useState<{
         showPopup: boolean;
-        reason: string | undefined;
-    }>({ showPopup: false, reason: undefined });
+        person: ReactElement | undefined;
+    }>({ showPopup: false, person: undefined });
 
-    const showErrorPopup = (reason: string) => {
+    const showErrorPopup = (person: PopupPerson, reason: string) => {
+        switch (person) {
+            case PopupPerson.AnnieFrown:
+                reason =
+                    reason +
+                    ", annie is disappointed in you for tyring to break the app (she talks in third person)";
+        }
+
         setPopupState({
             showPopup: true,
-            reason:
-                reason +
-                ", annie is disappointed in you for tyring to break the app (she talks in third person)",
+            person: getPersonPopupElement(person, reason),
         });
     };
 
-    const showInfoPopup = (reason: string) => {
+    const showInfoPopup = (
+        person: PopupPerson,
+        reason: string,
+        ms?: number,
+        closeOn?: Promise<any>
+    ) => {
         setPopupState({
             showPopup: true,
-            reason: reason + ", annie just wanted to let you know that",
+            person: getPersonPopupElement(person, reason),
         });
+
+        if (ms) {
+            setTimeout(closePopup, ms);
+        }
+
+        if (closeOn) {
+            closeOn.then(closePopup);
+        }
     };
 
     const closePopup = () => {
-        setPopupState({ showPopup: false, reason: undefined });
+        setPopupState({ showPopup: false, person: undefined });
+    };
+
+    const [backAnimationShowing, setBackAnimationShowing] =
+        useState<ShowableAnimations>();
+
+    const resetBackAnimation = () => {
+        setBackAnimationShowing(undefined);
+    };
+
+    const [frontAnimationShowing, setFrontAnimationShowing] =
+        useState<ShowableAnimations>();
+
+    const resetFrontAnimation = () => {
+        setFrontAnimationShowing(undefined);
+    };
+
+    const showAnimation = (animationToShow: ShowableAnimations) => {
+        switch (animationToShow) {
+            case ShowableAnimations.SpinningDakota:
+                setBackAnimationShowing(animationToShow);
+                break;
+        }
     };
 
     return (
-        <HelperContext.Provider
-            value={{
-                showErrorPopup: showErrorPopup,
-                showInfoPopup: showInfoPopup,
-            }}
-        >
-            <Popup
-                open={popupState.showPopup}
-                onClose={closePopup}
-                closeOnDocumentClick
-                modal
-            >
-                <CloseButton onClick={closePopup}>X</CloseButton>
-                <AnnieFrown
-                    reason={popupState.reason ? popupState.reason : ""}
-                />
-            </Popup>
-            {props.children}
-        </HelperContext.Provider>
+        <MainDiv>
+            <BackDiv>
+                <AnimatedBackground
+                    animationToShow={backAnimationShowing}
+                    onComplete={resetBackAnimation}
+                ></AnimatedBackground>
+            </BackDiv>
+            <CenterDiv>
+                <HelperContext.Provider
+                    value={{
+                        showErrorPopup: showErrorPopup,
+                        showInfoPopup: showInfoPopup,
+                        showAnimation: showAnimation,
+                    }}
+                >
+                    <Popup
+                        open={popupState.showPopup}
+                        onClose={closePopup}
+                        closeOnDocumentClick
+                        modal
+                    >
+                        <CloseButton onClick={closePopup}>X</CloseButton>
+                        {popupState.person}
+                    </Popup>
+                    {props.children}
+                </HelperContext.Provider>
+            </CenterDiv>
+            <FrontDiv>
+                <AnimatedBackground
+                    animationToShow={frontAnimationShowing}
+                    onComplete={resetFrontAnimation}
+                ></AnimatedBackground>
+            </FrontDiv>
+        </MainDiv>
     );
 }
